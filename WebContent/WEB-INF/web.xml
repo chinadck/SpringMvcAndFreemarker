@@ -5,32 +5,6 @@
 	id="WebApp_ID" version="3.0">
 	<display-name>SpringMvcAndFreemarker</display-name>
 
-	<!-- Spring MVC配置 -->
-	<!-- ====================================== -->
-	<servlet>
-		<servlet-name>spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>classpath:spring.xml</param-value>
-		</init-param>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>spring</servlet-name>
-		<url-pattern>*.do</url-pattern>
-	</servlet-mapping>
-	<!-- Spring配置 -->
-	<!-- ====================================== -->
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-	<!-- 指定Spring Bean的配置文件所在目录。默认配置在WEB-INF目录下 -->
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:applicationContext*.xml</param-value>
-	</context-param>
-
 	<welcome-file-list>
 		<welcome-file>index.do</welcome-file>
 		<welcome-file>index.htm</welcome-file>
@@ -39,4 +13,26 @@
 		<welcome-file>default.htm</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
 	</welcome-file-list>
+
+	<!-- ======================================================== -->
+	<!-- Spring MVC Config Servlet -->
+	<!-- ======================================================== -->
+	<!-- JSP DispatcherServlet -->
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:dispatcher-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- ======================================================== -->
+	<!-- Spring MVC Config Mapping -->
+	<!-- ======================================================== -->
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
 </web-app>
