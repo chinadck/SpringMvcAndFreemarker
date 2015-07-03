@@ -11,45 +11,6 @@
   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd  
   http://www.springframework.org/schema/mvc  http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
-		<property name="order" value="1"></property>
-		<property name="favorParameter" value="false"></property>
-		<property name="ignoreAccpetHeader" value="true"></property>
-		<property name="defaultContentType" value="application/json"></property>
-		<property name="mediaTypes">
-			<map>
-				<entry key="json" value="application/json"></entry>
-			</map>
-		</property>
-		<property name="viewResolvers">
-			<list>
-				<bean id="freeMarkerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-					<property name="cache" value="true" />
-					<property name="order" value="0" />
-					<property name="prefix" value="/view/" />
-					<property name="suffix" value=".html" />
-					<property name="contentType" value="text/html;charset=utf-8" />
-					<property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
-				</bean>
-			</list>
-		</property>
-		<property name="defaultViews">
-			<list>
-				<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
-			</list>
-		</property>
-	</bean>
-	
-	<!-- <bean id="freemarkerConfiguration" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-		<property name="location" value="classpath:freemarker.properties"></property>
-	</bean> -->
-	
-	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-		<property name="defaultEncoding" value="utf-8" />
-		<property name="templateLoaderPath" value="/view/" />
-		<!-- <property name="freemarkerSettings" ref="freemarkerConfiguration" /> -->
-	</bean>
-
 	<!-- 注解支持 -->
 	<mvc:annotation-driven />
 
@@ -58,4 +19,87 @@
 		<!-- 允许定义过滤器将基包下的某些类纳入或排除 <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/> -->
 	</context:component-scan>
 
+	<!-- freemarker的配置 -->
+	<bean id="freemarkerConfig"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/view/" />
+		<property name="defaultEncoding" value="utf-8" />
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="template_update_delay">10</prop>
+				<prop key="locale">zh_CN</prop>
+				<prop key="datetime_format">yyyy-MM-dd</prop>
+				<prop key="date_format">yyyy-MM-dd</prop>
+				<prop key="number_format">#.##</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"></property>
+
+		<property name="suffix" value=".html" />
+		<property name="contentType" value="text/html;charset=utf-8" />
+		<property name="exposeRequestAttributes" value="true" />
+		<property name="exposeSessionAttributes" value="true" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="defaultContentType" value="text/html" />
+
+		<!-- 扩展名至mimeType的映射,即 /user.json => application/json -->
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" />
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+			</map>
+		</property>
+		<!-- 用于开启 /userinfo/123?format=json 的支持 -->
+		<property name="favorParameter" value="false" />
+		<property name="favorPathExtension" value="true" />
+
+		<property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+			</list>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<!-- for application/json -->
+				<bean
+					class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+					<property name="extractValueFromSingleKeyModel" value="false" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="stringConverter"
+		class="org.springframework.http.converter.StringHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/plain;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 输出对象转JSON支持 -->
+	<bean id="jsonConverter"
+		class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"></bean>
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="stringConverter" />
+				<ref bean="jsonConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<mvc:resources mapping="/javascript/**" location="/view/javascript/" />
 </beans>  
